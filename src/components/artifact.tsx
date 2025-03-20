@@ -3,6 +3,7 @@
 import { ButtonWithLoader } from "@/components/button-with-loader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { emojis } from "@/lib/emojis";
 import type { Labyrinth } from "@/lib/labyrinth";
 import { cn } from "@/lib/utils";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -43,7 +44,7 @@ function LabyrinthSolver() {
 
       if (!result) {
         setError(
-          `No path found from "${start}" to "${end}" within ${maxDepth} steps`,
+          `Hittade inte väg från "${start}" till "${end}" inom rimligt antal steg.`,
         );
 
         setIsExploding(false);
@@ -73,7 +74,7 @@ function LabyrinthSolver() {
   }, [start, end]);
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 rounded-lg bg-card p-6 shadow-md">
+    <div className="container mx-auto max-w-2xl space-y-6 overflow-hidden rounded-lg bg-card p-6 shadow-md">
       <h1 className="text-center text-2xl font-bold">🇸🇪 Labyrintlösaren 🇸🇪</h1>
       <p className="text-center text-sm text-muted-foreground">
         Bättre än svensk fika
@@ -88,7 +89,9 @@ function LabyrinthSolver() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-x-6 gap-y-6">
             <div className="space-y-2">
-              <Label htmlFor="start">Start 🏁</Label>
+              <Label htmlFor="start">
+                Start {emojis[start as keyof typeof emojis] ?? "🏁"}
+              </Label>
               <Input
                 id="start"
                 value={start}
@@ -103,7 +106,7 @@ function LabyrinthSolver() {
             <div className="space-y-2">
               <div>
                 <Label htmlFor="end" className="">
-                  Slut ⛳️
+                  Slut {emojis[end as keyof typeof emojis] ?? "⛳️"}
                 </Label>
               </div>
               <Input
@@ -153,12 +156,13 @@ function LabyrinthSolver() {
             Resultat: {path.length - 1} steg
           </h2>
           <div className="rounded-md bg-muted p-4">
-            <div className="grid grid-flow-col justify-between">
-              {/* <div className="bg-red-500/50 grid gap-x-6 gap-y-6"> */}
-              {path.map((word, index) => (
+            <div className="flex flex-wrap justify-between">
+              {path.map((word, index, arr) => (
                 <React.Fragment key={index}>
-                  <span className="font-medium">{word}</span>
-                  {index < path.length - 1 && <span className="mx-2">→</span>}
+                  <span className="whitespace-nowrap font-medium">
+                    {`${word} ${emojis[word as keyof typeof emojis] ?? ""}`}
+                  </span>
+                  {index < arr.length - 1 && <span className="mx-2">→</span>}
                 </React.Fragment>
               ))}
             </div>
