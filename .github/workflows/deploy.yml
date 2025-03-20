@@ -73,15 +73,6 @@ jobs:
       - name: Build with Next.js
         run: pnpm next build
 
-      - name: Check if build directory exists
-        run: |
-          if [ -d "./out" ]; then
-            echo "Build directory exists"
-          else
-            echo "Build directory does not exist"
-            exit 1
-          fi
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
