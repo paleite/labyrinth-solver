@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-import { env } from "@/env";
-
 const nextConfig: NextConfig = {
   // Turns off typechecking
   typescript: {
@@ -19,6 +17,9 @@ const nextConfig: NextConfig = {
 
   // This is needed for the build to be static
   output: "export",
+
+  // Add basePath for GitHub Pages
+  basePath: process.env.NODE_ENV === "production" ? "/labyrinth-solver" : "",
 
   images: {
     unoptimized: true,

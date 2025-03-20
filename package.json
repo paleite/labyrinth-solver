@@ -1,5 +1,5 @@
 {
-  "name": "car",
+  "name": "labyrinth-solver",
   "version": "0.1.0",
   "private": true,
   "scripts": {
