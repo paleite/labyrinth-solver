@@ -54,6 +54,7 @@
     "papaparse": "^5.5.2",
     "plotly.js": "^3.0.0",
     "react": "^19.0.0",
+    "react-confetti-blast": "^1.0.2",
     "react-day-picker": "8.10.1",
     "react-dom": "^19.0.0",
     "react-resizable-panels": "^2.1.7",

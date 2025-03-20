@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Artifact Viewer",
-  description: "Artifact Viewer",
+  title: "Labyrintlösaren",
+  description: "Bättre än svensk fika",
 };
 
 export default function RootLayout({

@@ -1,36 +1,60 @@
 "use client";
 
+import ConfettiExplosion from "react-confetti-blast";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ButtonWithLoader } from "@/components/button-with-loader";
-import { Loader2 } from "lucide-react";
+import type { Labyrinth } from "@/lib/labyrinth";
+import { toast } from "sonner";
+import React from "react";
+import { cn } from "@/lib/utils";
+
 const maxDepth = 10;
 
+const largeProps: ConfettiProps = {
+  force: 0.8,
+  duration: 3000,
+  particleCount: 300,
+  width: 1600,
+  colors: ["#041E43", "#1471BF", "#5BB4DC", "#FC027B", "#66D805"],
+};
 function LabyrinthSolver() {
-  const [isPending, setIsPending] = useState(false);
+  const [isExploding, setIsExploding] = React.useState(false);
+
+  const [isCalculating, setIsCalculating] = useState(false);
   const [duration, setDuration] = useState(0);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [path, setPath] = useState<string[] | null>(null);
+  const [path, setPath] = useState<Labyrinth>(null);
   const [error, setError] = useState("");
   const workerRef = useRef<Worker>(null);
 
   useEffect(() => {
     workerRef.current = new Worker(new URL("../worker.ts", import.meta.url));
-    workerRef.current.onmessage = (event: MessageEvent<string[] | null>) => {
-      setIsPending(false);
-      console.log("returned from worker");
+    workerRef.current.onmessage = (event: MessageEvent<Labyrinth>) => {
       performance.mark("end");
       performance.measure("worker", "start", "end");
+      setIsCalculating(false);
+
       const result = event.data;
       setPath(result);
       setDuration(performance.getEntriesByName("worker").at(-1)?.duration ?? 0);
 
       if (!result) {
         setError(
-          `No path found from "${start}" to "${end}" within depth ${maxDepth}`,
+          `No path found from "${start}" to "${end}" within ${maxDepth} steps`,
         );
+
+        setIsExploding(false);
+      } else {
+        toast.success(
+          <div className="flex items-center gap-2 text-2xl">
+            Clara är bäst ❤️
+          </div>,
+        );
+
+        setIsExploding(true);
       }
     };
 
@@ -41,78 +65,105 @@ function LabyrinthSolver() {
 
   const handleWorker = useCallback(async () => {
     setError("");
-
-    // Validate inputs
-    if (start.length !== 4) {
-      setError("Start word must be exactly 4 letters long");
-      return;
-    }
-
-    if (end.length !== 4) {
-      setError("End word must be exactly 4 letters long");
-      return;
-    }
-
-    console.log("sending to worker");
-    setIsPending(true);
+    setPath(null);
+    setIsExploding(false);
+    setIsCalculating(true);
     performance.mark("start");
     workerRef.current?.postMessage({ start, end, maxDepth });
   }, [start, end]);
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 rounded-lg bg-card p-6 shadow-sm">
-      <h1 className="text-2xl font-bold">Labyrinth Solver</h1>
+    <div className="mx-auto max-w-lg space-y-6 rounded-lg bg-card p-6 shadow-md">
+      <h1 className="text-center text-2xl font-bold">🇸🇪 Labyrintlösaren 🇸🇪</h1>
+      <p className="text-center text-sm text-muted-foreground">
+        Bättre än svensk fika
+      </p>
 
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="start">Start Word (4 letters)</Label>
-          <Input
-            id="start"
-            value={start}
-            onChange={(e) => setStart(e.target.value.toLowerCase())}
-            placeholder="Enter start word"
-            maxLength={4}
-          />
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleWorker();
+        }}
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="start">Start 🏁</Label>
+              <Input
+                id="start"
+                value={start}
+                onChange={(e) => setStart(e.target.value.toUpperCase())}
+                placeholder="Ex. HÖRA"
+                minLength={4}
+                maxLength={4}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div>
+                <Label htmlFor="end" className="">
+                  Slut ⛳️
+                </Label>
+              </div>
+              <Input
+                id="end"
+                value={end}
+                onChange={(e) => setEnd(e.target.value.toUpperCase())}
+                placeholder="Ex. BORG"
+                minLength={4}
+                maxLength={4}
+                required
+              />
+            </div>
+
+            <div className="col-span-2 w-full">
+              {isExploding && (
+                <div className="col-span-2 flex items-center justify-center bg-red-500">
+                  <ConfettiExplosion {...largeProps} />
+                </div>
+              )}
+
+              <ButtonWithLoader
+                isPending={isCalculating}
+                className="h-auto w-full"
+                renderLoader={
+                  <div
+                    className={cn(
+                      "grid grid-flow-col items-center gap-2 opacity-0 transition-opacity duration-300",
+                      isCalculating && "opacity-100",
+                    )}
+                  >
+                    <div className="animate-spin text-5xl">🧠</div>
+                  </div>
+                }
+              >
+                Lös labyrinten
+              </ButtonWithLoader>
+            </div>
+          </div>
         </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="end">End Word (4 letters)</Label>
-          <Input
-            id="end"
-            value={end}
-            onChange={(e) => setEnd(e.target.value.toLowerCase())}
-            placeholder="Enter end word"
-            maxLength={4}
-          />
-        </div>
-
-        <ButtonWithLoader
-          isPending={isPending}
-          onClick={handleWorker}
-          className="w-full"
-          renderLoader={<Loader2 className="h-4 w-4 animate-spin" />}
-        >
-          Solve
-        </ButtonWithLoader>
-      </div>
+      </form>
 
       {error && <div className="mt-4 text-destructive">{error}</div>}
 
       {path && !error && (
         <div className="mt-6 space-y-2">
-          <h2 className="text-xl font-semibold">Solution Path</h2>
-          <span>Time taken: {duration}ms</span>
+          <h2 className="text-xl font-semibold">
+            Resultat: {path.length - 1} steg
+          </h2>
           <div className="rounded-md bg-muted p-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-flow-col justify-between">
+              {/* <div className="bg-red-500/50 grid gap-x-6 gap-y-6"> */}
               {path.map((word, index) => (
-                <div key={index} className="flex items-center">
+                <React.Fragment key={index}>
                   <span className="font-medium">{word}</span>
                   {index < path.length - 1 && <span className="mx-2">→</span>}
-                </div>
+                </React.Fragment>
               ))}
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Path length: {path.length - 1} steps
+              Tid: {duration.toFixed(2)} ms
             </p>
           </div>
         </div>
