@@ -18,27 +18,27 @@ const findWordsWithSameLetters = (word: string) => {
   );
 };
 
-const visited = new Set<string>();
+// const visited = new Set<string>();
 
-const findPath = (word: string, depth: number): any => {
-  if (depth > maxDepth) {
-    return false;
-  }
-  const alternatives = [
-    ...findWordsWithOneLetterDifference(word),
-    ...findWordsWithSameLetters(word),
-  ];
-  if (alternatives.includes(lastWord)) {
-    return true;
-  }
-  if (visited.has(word)) {
-    return false;
-  }
-  visited.add(word);
-  return alternatives.some((w) => findPath(w, depth + 1));
-};
+// const findPath = (word: string, depth: number): any => {
+//   if (depth > maxDepth) {
+//     return false;
+//   }
+//   const alternatives = [
+//     ...findWordsWithOneLetterDifference(word),
+//     ...findWordsWithSameLetters(word),
+//   ];
+//   if (alternatives.includes(lastWord)) {
+//     return true;
+//   }
+//   if (visited.has(word)) {
+//     return false;
+//   }
+//   visited.add(word);
+//   return alternatives.some((w) => findPath(w, depth + 1));
+// };
 
-type Path = string[];
+export type Path = string[];
 
 const bfsFindShortestPath = (
   start: string,

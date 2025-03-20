@@ -1,19 +1,43 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { solveLabyrinth } from "./labyrinth";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const maxDepth = 10;
 
 function LabyrinthSolver() {
+  const [duration, setDuration] = useState(0);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [path, setPath] = useState<string[] | null>(null);
   const [error, setError] = useState("");
-  const maxDepth = 10;
+  const workerRef = useRef<Worker>(null);
 
-  const handleSolve = () => {
+  useEffect(() => {
+    workerRef.current = new Worker(new URL("../worker.ts", import.meta.url));
+    workerRef.current.onmessage = (event: MessageEvent<string[] | null>) => {
+      console.log("returned from worker");
+      performance.mark("end");
+      performance.measure("worker", "start", "end");
+      const result = event.data;
+      setPath(result);
+      setDuration(performance.getEntriesByName("worker").at(-1)?.duration ?? 0);
+
+      if (!result) {
+        setError(
+          `No path found from "${start}" to "${end}" within depth ${maxDepth}`,
+        );
+      }
+    };
+
+    return () => {
+      workerRef.current?.terminate();
+    };
+  }, [end, start]);
+
+  const handleWorker = useCallback(async () => {
     setError("");
 
     // Validate inputs
@@ -27,16 +51,10 @@ function LabyrinthSolver() {
       return;
     }
 
-    // Solve labyrinth
-    const result = solveLabyrinth(start, end, maxDepth);
-    setPath(result);
-
-    if (!result) {
-      setError(
-        `No path found from "${start}" to "${end}" within depth ${maxDepth}`,
-      );
-    }
-  };
+    console.log("sending to worker");
+    performance.mark("start");
+    workerRef.current?.postMessage({ start, end, maxDepth });
+  }, [start, end]);
 
   return (
     <div className="mx-auto max-w-lg space-y-6 rounded-lg bg-card p-6 shadow-sm">
@@ -65,7 +83,7 @@ function LabyrinthSolver() {
           />
         </div>
 
-        <Button onClick={handleSolve} className="w-full">
+        <Button onClick={handleWorker} className="w-full">
           Solve
         </Button>
       </div>
@@ -75,6 +93,7 @@ function LabyrinthSolver() {
       {path && !error && (
         <div className="mt-6 space-y-2">
           <h2 className="text-xl font-semibold">Solution Path</h2>
+          <span>Time taken: {duration}ms</span>
           <div className="rounded-md bg-muted p-4">
             <div className="flex flex-wrap gap-2">
               {path.map((word, index) => (
