@@ -18,7 +18,12 @@ const largeProps: ConfettiProps = {
   duration: 3000,
   particleCount: 300,
   width: 1600,
-  colors: ["#041E43", "#1471BF", "#5BB4DC", "#FC027B", "#66D805"],
+  colors: [
+    // Blå
+    "#0057B7",
+    // Gul
+    "#FFD700",
+  ],
 };
 function LabyrinthSolver() {
   const [isExploding, setIsExploding] = React.useState(false);
