@@ -7,6 +7,7 @@
     "dev": "next dev --turbopack",
     "format": "prettier --write --ignore-unknown .",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "start": "next start"
   },
   "dependencies": {

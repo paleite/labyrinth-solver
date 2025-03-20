@@ -1,14 +1,14 @@
 "use client";
 
-import ConfettiExplosion from "react-confetti-blast";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ButtonWithLoader } from "@/components/button-with-loader";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ButtonWithLoader } from "@/components/button-with-loader";
 import type { Labyrinth } from "@/lib/labyrinth";
-import { toast } from "sonner";
-import React from "react";
 import { cn } from "@/lib/utils";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import type { ConfettiProps } from "react-confetti-blast";
+import ConfettiExplosion from "react-confetti-blast";
+import { toast } from "sonner";
 
 const maxDepth = 10;
 
