@@ -35,6 +35,7 @@
     "@radix-ui/react-tooltip": "^1.1.8",
     "ag-grid-community": "^33.1.0",
     "ag-grid-react": "^33.1.0",
+    "babel-plugin-react-compiler": "^19.0.0-beta-3229e95-20250315",
     "chart.js": "^4.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
