@@ -3124,3 +3124,5 @@ export const words = [
   "ZOOM",
   "ZOOS",
 ] as const;
+
+export type Word = (typeof words)[number];
