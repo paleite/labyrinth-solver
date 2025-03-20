@@ -1,13 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import { ButtonWithLoader } from "@/components/button-with-loader";
+import { Loader2 } from "lucide-react";
 const maxDepth = 10;
 
 function LabyrinthSolver() {
+  const [isPending, setIsPending] = useState(false);
   const [duration, setDuration] = useState(0);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -18,6 +19,7 @@ function LabyrinthSolver() {
   useEffect(() => {
     workerRef.current = new Worker(new URL("../worker.ts", import.meta.url));
     workerRef.current.onmessage = (event: MessageEvent<string[] | null>) => {
+      setIsPending(false);
       console.log("returned from worker");
       performance.mark("end");
       performance.measure("worker", "start", "end");
@@ -52,6 +54,7 @@ function LabyrinthSolver() {
     }
 
     console.log("sending to worker");
+    setIsPending(true);
     performance.mark("start");
     workerRef.current?.postMessage({ start, end, maxDepth });
   }, [start, end]);
@@ -83,9 +86,14 @@ function LabyrinthSolver() {
           />
         </div>
 
-        <Button onClick={handleWorker} className="w-full">
+        <ButtonWithLoader
+          isPending={isPending}
+          onClick={handleWorker}
+          className="w-full"
+          renderLoader={<Loader2 className="h-4 w-4 animate-spin" />}
+        >
           Solve
-        </Button>
+        </ButtonWithLoader>
       </div>
 
       {error && <div className="mt-4 text-destructive">{error}</div>}
