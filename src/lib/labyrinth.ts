@@ -19,6 +19,7 @@ const findWordsWithSameLetters = (word: string) => {
 const bfsFindShortestPath = (
   start: string,
   end: string,
+  excludedWords: string[],
   maxDepth: number,
 ): string[] | null => {
   const queue: [string, string[]][] = [[start, [start]]];
@@ -38,7 +39,7 @@ const bfsFindShortestPath = (
     const neighbors = [
       ...findWordsWithOneLetterDifference(currentWord),
       ...findWordsWithSameLetters(currentWord),
-    ];
+    ].filter((word) => !excludedWords.includes(word));
     for (const neighbor of neighbors) {
       if (!visited.has(neighbor)) {
         visited.add(neighbor);
@@ -50,8 +51,13 @@ const bfsFindShortestPath = (
   return null; // No path found within maxDepth
 };
 
-const solveLabyrinth = (start: string, end: string, maxDepth: number) => {
-  const path = bfsFindShortestPath(start, end, maxDepth);
+const solveLabyrinth = (
+  start: string,
+  end: string,
+  excludedWords: string[],
+  maxDepth: number,
+) => {
+  const path = bfsFindShortestPath(start, end, excludedWords, maxDepth);
   return path;
 };
 

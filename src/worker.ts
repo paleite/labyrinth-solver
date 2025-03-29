@@ -1,10 +1,19 @@
 import { solveLabyrinth } from "@/lib/labyrinth";
 
-addEventListener(
-  "message",
-  (event: MessageEvent<{ start: string; end: string; maxDepth: number }>) => {
-    postMessage(
-      solveLabyrinth(event.data.start, event.data.end, event.data.maxDepth),
-    );
-  },
-);
+export type SolveLabyrinthEvent = MessageEvent<{
+  start: string;
+  end: string;
+  excludedWords: string[];
+  maxDepth: number;
+}>;
+
+addEventListener("message", (event: SolveLabyrinthEvent) => {
+  postMessage(
+    solveLabyrinth(
+      event.data.start,
+      event.data.end,
+      event.data.excludedWords,
+      event.data.maxDepth,
+    ),
+  );
+});

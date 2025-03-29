@@ -6,10 +6,13 @@ import { Label } from "@/components/ui/label";
 import { emojis } from "@/lib/emojis";
 import type { Labyrinth } from "@/lib/labyrinth";
 import { cn } from "@/lib/utils";
+import { words } from "@/lib/words";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ConfettiProps } from "react-confetti-blast";
 import ConfettiExplosion from "react-confetti-blast";
 import { toast } from "sonner";
+import { MultiSelect } from "./multi-select";
+import { SolveLabyrinthEvent } from "@/worker";
 
 const maxDepth = 10;
 
@@ -32,6 +35,7 @@ function LabyrinthSolver() {
   const [duration, setDuration] = useState(0);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [excludedWords, setExcludedWords] = useState<string[]>([]);
   const [path, setPath] = useState<Labyrinth>(null);
   const [error, setError] = useState("");
   const workerRef = useRef<Worker>(null);
@@ -75,8 +79,13 @@ function LabyrinthSolver() {
     setIsExploding(false);
     setIsCalculating(true);
     performance.mark("start");
-    workerRef.current?.postMessage({ start, end, maxDepth });
-  }, [start, end]);
+    workerRef.current?.postMessage({
+      start,
+      end,
+      excludedWords,
+      maxDepth,
+    } satisfies SolveLabyrinthEvent["data"]);
+  }, [start, end, excludedWords]);
 
   return (
     <div className="container mx-auto max-w-2xl space-y-6 overflow-hidden rounded-lg bg-card p-6 shadow-md">
@@ -123,6 +132,22 @@ function LabyrinthSolver() {
                 maxLength={4}
                 required
               />
+            </div>
+
+            <div className="col-span-2">
+              <details>
+                <summary>
+                  <Label className="cursor-pointer">Exkludera ord</Label>
+                </summary>
+                <MultiSelect
+                  value={excludedWords}
+                  onValueChange={(value) => setExcludedWords(value)}
+                  options={words.map((word) => ({
+                    value: word,
+                    label: word,
+                  }))}
+                />
+              </details>
             </div>
 
             <div className="col-span-2 w-full">
