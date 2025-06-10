@@ -72,6 +72,10 @@ export function MultiSelect({
 
   // Filter options based on the current search text (case-insensitive).
   const filteredOptions = React.useMemo(() => {
+    if (filterText === "") {
+      return [];
+    }
+
     return options.filter((option) =>
       option.label.toLowerCase().includes(filterText.toLowerCase()),
     );
