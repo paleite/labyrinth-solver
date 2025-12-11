@@ -311,7 +311,7 @@ export const words = [
   "BOCK",
   "BODS",
   "BOET",
-  "BÖGA",
+  // "BÖGA", // Invalid word
   "BOGS",
   "BÖGS",
   "BOJA",
@@ -488,7 +488,7 @@ export const words = [
   "DIRK",
   "DISK",
   "DISS",
-  "DIST",
+  // "DIST", // Invalid word
   "DITT",
   "DIVA",
   "DJUP",
@@ -1636,7 +1636,7 @@ export const words = [
   "LUGN",
   "LUKT",
   "LUND",
-  "LUNG",
+  // "LUNG", // Invalid word
   "LUNS",
   "LUPP",
   "LURA",
@@ -1661,7 +1661,7 @@ export const words = [
   "LYTT",
   "LYXA",
   "MACK",
-  "MACS",
+  // "MACS", // Invalid word
   "MADS",
   "MÅFÅ",
   "MAGE",
