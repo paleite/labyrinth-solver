@@ -1332,6 +1332,7 @@ export const words = [
   "KLYV",
   "KNÄA",
   "KNAK",
+  "KNAS",
   "KNÄN",
   "KNÅP",
   "KNÄS",
