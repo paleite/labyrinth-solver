@@ -7,14 +7,15 @@ import { emojis } from "@/lib/emojis";
 import type { Labyrinth } from "@/lib/labyrinth";
 import { cn } from "@/lib/utils";
 import { words } from "@/lib/words";
+import type { SolveLabyrinthEvent } from "@/worker";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ConfettiProps } from "react-confetti-blast";
 import ConfettiExplosion from "react-confetti-blast";
 import { toast } from "sonner";
 import { MultiSelect } from "./multi-select";
-import { SolveLabyrinthEvent } from "@/worker";
 
 const maxDepth = 10;
+const knownWords: ReadonlySet<string> = new Set(words);
 
 const largeProps: ConfettiProps = {
   force: 0.8,
@@ -39,6 +40,11 @@ function LabyrinthSolver() {
   const [path, setPath] = useState<Labyrinth>(null);
   const [error, setError] = useState("");
   const workerRef = useRef<Worker>(null);
+
+  const unknownEndpointWords = [
+    start.length === 4 && !knownWords.has(start) ? start : null,
+    end.length === 4 && !knownWords.has(end) ? end : null,
+  ].filter((word): word is string => word !== null);
 
   useEffect(() => {
     workerRef.current = new Worker(new URL("../worker.ts", import.meta.url));
@@ -133,6 +139,27 @@ function LabyrinthSolver() {
                 required
               />
             </div>
+
+            {unknownEndpointWords.length > 0 && (
+              <div
+                role="status"
+                className="col-span-2 rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
+              >
+                {unknownEndpointWords.length === 1 ? (
+                  <>
+                    Ordet <strong>{unknownEndpointWords[0]}</strong> saknas i
+                    ordlistan. Det används ändå som start- eller slutord, men
+                    inte som ett normalt mellanord.
+                  </>
+                ) : (
+                  <>
+                    Orden <strong>{unknownEndpointWords.join(" och ")}</strong>{" "}
+                    saknas i ordlistan. De används ändå som start- och slutord,
+                    men inte som normala mellanord.
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="col-span-2">
               <details>
