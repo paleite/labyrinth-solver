@@ -1,4 +1,4 @@
-import { words } from "@/lib/words";
+import { words } from "./words";
 
 const findWordsWithOneLetterDifference = (
   word: string,
@@ -28,28 +28,51 @@ const findWordsWithSameLetters = (
   );
 };
 
-const bfsFindShortestPath = (
+export type LabyrinthPath = string[];
+
+function* findShortestPaths(
   start: string,
   end: string,
   excludedWords: string[],
   maxDepth: number,
-): string[] | null => {
+  dictionary: readonly string[] = words,
+): Generator<LabyrinthPath> {
   // The dictionary controls intermediate words. Start and end are always
   // valid graph nodes, even when they are absent from the dictionary.
-  const candidateWords = [...new Set([...words, start, end])];
+  const candidateWords = [...new Set([...dictionary, start, end])];
   const excludedWordSet = new Set(excludedWords);
-  const queue: [string, string[]][] = [[start, [start]]];
+  const queue: LabyrinthPath[] = [[start]];
   let queueIndex = 0;
-  const visited = new Set<string>([start]);
+  const bestDepthByWord = new Map<string, number>([[start, 0]]);
+  const yieldedPaths = new Set<string>();
+  let shortestDepth: number | null = null;
 
   while (queueIndex < queue.length) {
-    const [currentWord, path] = queue[queueIndex++];
+    const path = queue[queueIndex++];
+    const currentWord = path.at(-1);
+    const currentDepth = path.length - 1;
 
-    if (currentWord === end) {
-      return path;
+    if (!currentWord) {
+      continue;
     }
 
-    if (path.length >= maxDepth + 1) {
+    if (shortestDepth !== null && currentDepth > shortestDepth) {
+      break;
+    }
+
+    if (currentWord === end) {
+      shortestDepth ??= currentDepth;
+
+      const pathKey = path.join("\0");
+      if (!yieldedPaths.has(pathKey)) {
+        yieldedPaths.add(pathKey);
+        yield path;
+      }
+
+      continue;
+    }
+
+    if (currentDepth >= maxDepth) {
       continue;
     }
 
@@ -59,27 +82,20 @@ const bfsFindShortestPath = (
     ].filter((word) => word === end || !excludedWordSet.has(word));
 
     for (const neighbor of neighbors) {
-      if (visited.has(neighbor)) {
+      const neighborDepth = currentDepth + 1;
+      const bestKnownDepth = bestDepthByWord.get(neighbor);
+
+      if (bestKnownDepth !== undefined && bestKnownDepth < neighborDepth) {
         continue;
       }
 
-      visited.add(neighbor);
-      queue.push([neighbor, [...path, neighbor]]);
+      if (bestKnownDepth === undefined) {
+        bestDepthByWord.set(neighbor, neighborDepth);
+      }
+
+      queue.push([...path, neighbor]);
     }
   }
+}
 
-  return null;
-};
-
-const solveLabyrinth = (
-  start: string,
-  end: string,
-  excludedWords: string[],
-  maxDepth: number,
-) => {
-  return bfsFindShortestPath(start, end, excludedWords, maxDepth);
-};
-
-export type Labyrinth = ReturnType<typeof solveLabyrinth>;
-
-export { solveLabyrinth };
+export { findShortestPaths };
