@@ -544,6 +544,7 @@ export const words = [
   "DROG",
   "DRÖJ",
   "DRÖM",
+  "DRÖN",
   "DRÖP",
   "DRÖS",
   "DRYG",

@@ -451,6 +451,7 @@ export const emojis = {
   DROG: "💊",
   DRÖJ: "⏳",
   DRÖM: "💭",
+  DRÖN: "🔊",
   // DRÖP: "",
   // DRÖS: "",
   DRYG: "😒",
