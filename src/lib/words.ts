@@ -1486,6 +1486,7 @@ export const words = [
   "LAME",
   "LAMM",
   "LAMT",
+  "LANA",
   "LÅNA",
   "LAND",
   "LÅNE",
