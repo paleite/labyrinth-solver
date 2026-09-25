@@ -2747,7 +2747,6 @@ export const words = [
   "TÄTT",
   "TAXA",
   "TAXI",
-  "TAXS",
   "TEAK",
   "TEAM",
   "TEDD",
