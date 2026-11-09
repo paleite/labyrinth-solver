@@ -2675,6 +2675,7 @@ export const words = [
   "SVID",
   "SVIK",
   "SVIN",
+  "SVIR",
   "SVIT",
   "SVOR",
   "SYDD",
