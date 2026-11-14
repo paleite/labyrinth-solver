@@ -1571,6 +1571,7 @@ export const words = [
   "LIPA",
   "LIRA",
   "LIRE",
+  "LISA",
   "LIST",
   "LITA",
   "LITE",
