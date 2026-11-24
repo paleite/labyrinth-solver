@@ -817,6 +817,8 @@ export const words = [
   "GAGE",
   "GAGN",
   "GALA",
+  "GARA",
+  "GATT",
   "GÄLD",
   "GÄLL",
   "GÄLS",
