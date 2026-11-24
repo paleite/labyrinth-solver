@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Popover,
+  PopoverArrow,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
@@ -61,14 +62,16 @@ function SolutionWord({ word }: { word: string }) {
       <PopoverContent
         aria-label={`Betydelsen av ${word}`}
         side="top"
-        sideOffset={6}
+        sideOffset={4}
         collisionPadding={12}
-        className="w-max max-w-[min(18rem,var(--radix-popover-content-available-width))] space-y-1 rounded-md border-0 bg-primary px-3 py-2 text-sm text-primary-foreground"
+        arrowPadding={6}
+        className="w-max max-w-[min(18rem,var(--radix-popover-content-available-width))] origin-[var(--radix-popover-content-transform-origin)] space-y-1 rounded-md border-0 bg-primary px-3 py-2 text-sm text-primary-foreground"
       >
         <p className="font-semibold">{word}</p>
         <p className="break-words">
           {description ?? "Ingen beskrivning finns för det här ordet."}
         </p>
+        <PopoverArrow width={12} height={6} className="fill-primary" />
       </PopoverContent>
     </Popover>
   );
