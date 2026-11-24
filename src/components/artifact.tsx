@@ -4,10 +4,16 @@ import { ButtonWithLoader } from "@/components/button-with-loader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { descriptions } from "@/lib/descriptions";
 import { emojis } from "@/lib/emojis";
 import type { LabyrinthPath } from "@/lib/labyrinth";
 import { cn } from "@/lib/utils";
-import { words } from "@/lib/words";
+import { words, type Word } from "@/lib/words";
 import type { SolveLabyrinthRequest, SolveLabyrinthResponse } from "@/worker";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { ConfettiProps } from "react-confetti-blast";
@@ -35,6 +41,39 @@ const largeProps: ConfettiProps = {
     "#FFD700",
   ],
 };
+function SolutionWord({ word }: { word: string }) {
+  const knownWord = knownWords.has(word) ? (word as Word) : null;
+  const emoji = knownWord === null ? null : emojis[knownWord];
+  const description = knownWord === null ? null : descriptions[knownWord];
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={`Visa betydelsen av ${word}`}
+          className="inline-flex min-h-11 items-center gap-1 whitespace-nowrap rounded-md px-1 font-medium underline decoration-dotted underline-offset-4 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=open]:bg-accent"
+        >
+          {word}
+          {emoji && <span aria-hidden="true">{emoji}</span>}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        aria-label={`Betydelsen av ${word}`}
+        side="top"
+        sideOffset={6}
+        collisionPadding={12}
+        className="w-max max-w-[min(18rem,var(--radix-popover-content-available-width))] space-y-1 rounded-md border-0 bg-primary px-3 py-2 text-sm text-primary-foreground"
+      >
+        <p className="font-semibold">{word}</p>
+        <p className="break-words">
+          {description ?? "Ingen beskrivning finns för det här ordet."}
+        </p>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 function LabyrinthSolver() {
   const [isExploding, setIsExploding] = React.useState(false);
 
@@ -329,6 +368,9 @@ function LabyrinthSolver() {
             {solutions.length === 1 ? "lösning" : "lösningar"},{" "}
             {solutions[0].path.length - 1} steg
           </h2>
+          <p className="text-sm text-muted-foreground">
+            Tryck på ett ord för att se vad det betyder.
+          </p>
           {solutions.map((solution, solutionIndex) => (
             <div
               key={solution.path.join("→")}
@@ -337,14 +379,14 @@ function LabyrinthSolver() {
               <h3 className="mb-2 font-semibold">
                 Lösning {solutionIndex + 1}
               </h3>
-              <div className="flex flex-wrap justify-between">
+              <div className="flex flex-wrap items-center justify-between">
                 {solution.path.map((word, wordIndex, path) => (
                   <React.Fragment key={`${word}-${wordIndex}`}>
-                    <span className="whitespace-nowrap font-medium">
-                      {`${word} ${emojis[word as keyof typeof emojis] ?? ""}`}
-                    </span>
+                    <SolutionWord word={word} />
                     {wordIndex < path.length - 1 && (
-                      <span className="mx-2">→</span>
+                      <span className="mx-2" aria-hidden="true">
+                        →
+                      </span>
                     )}
                   </React.Fragment>
                 ))}
